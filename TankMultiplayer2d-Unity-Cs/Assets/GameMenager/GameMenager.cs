@@ -13,22 +13,34 @@ public class GameMenager : MonoBehaviour
     GameObject player2GO = null;
     Shop shop = null;
 
-    [Header("ControlCanvas")]
+    [Header("ControlCanvasUp")]
     [SerializeField] Canvas control = null;
     [SerializeField] GameObject hpBar1 = null;
+    [SerializeField] Text namePlayer1 = null;
     [SerializeField] Text hpText1 = null;
     [SerializeField] Text coin1Text = null;
     public int coin1 = 0;
     [SerializeField] GameObject hpBar2 = null;
+    [SerializeField] Text namePlayer2 = null;
     [SerializeField] Text hpText2 = null;
     [SerializeField] Text coin2Text = null;
     public int coin2 = 0;
+    [SerializeField] Text turnText = null;
+    int maxTurn = 0;
+    int cTurn = 0;
+    [SerializeField] Text scoreText = null;
+    int[] score = new int[2];
+
+
+    [Header("ControlCanvasDown")]
     [SerializeField] GameObject fuelBar = null;
     [SerializeField] Text fuelText = null;
     [SerializeField] GameObject forceBar = null;
     [SerializeField] Text forceText = null;
     [SerializeField] Text angleText = null;
     [SerializeField] Text weaponText = null;
+
+    [SerializeField] Canvas turnCanvas = null;
     CameraFollow myCamera = null;
     Canvas canvasShop = null;
 
@@ -36,32 +48,12 @@ public class GameMenager : MonoBehaviour
     const string player2s = "Player2";
     const string coinString = "COINS: ";
     //Public
-    public void FirstTurn()
-    {
-        myCamera = GetComponent<CameraFollow>();
-        if(player1GO==null || player2GO==null)
-        {
-            player1GO = GameObject.FindGameObjectWithTag(player1s);
-            player2GO = GameObject.FindGameObjectWithTag(player2s);
-            player1 = player1GO.GetComponent<Player>();
-            player2 = player2GO.GetComponent<Player>();
-        }
-        
-        shop = FindObjectOfType<Shop>();
-        canvasShop = shop.GetComponent<Canvas>();
-        canvasShop.enabled = false;
 
-        player1.enabled = true;
-        player2.enabled = false;
-        myCamera.SetTargetToCamera(player1GO.transform);
-        //TODO if isnt first turn dont change the coin
-        coin1 = 0;
-        coin2 = 0;
-        SetCoin();
-    }
+    public void StartFirstTurn() { StartCoroutine(FirstTurn()); }
     public void StartNewTurn() { StartCoroutine(NextTurn()); }
-    public void SetCoin()
+    public void SetCoin(int add)
     {
+        coin1 = coin2 = add;
         coin1Text.text = coinString + coin1.ToString();
         coin2Text.text = coinString + coin2.ToString();
     }
@@ -79,34 +71,57 @@ public class GameMenager : MonoBehaviour
         }
 
     }
+    public void SetMaxTurn(int max) { maxTurn = max; SetTurnText(); }
+    public void ResetScore() { score[0] = 0; score[1] = 0; }
     public void PlaySounds(AudioClip audio)
     {
         AudioSource source = GetComponent<AudioSource>();
         source.PlayOneShot(audio);
     }
-    public void Kill()
+    public void Kill(string tag)
     {
+        if (player1GO.CompareTag(tag))
+            score[1]++;
+        else
+            score[0]++;
+
         Destroy(player1GO);
         Destroy(player2GO);
 
+        cTurn++;
+        if(cTurn>maxTurn)
+        {
+            //TODO display score for winner
+            control.enabled = false;
+            return;
+        }
         control.enabled = false;
         canvasShop.enabled = true;
         shop.Setup();
     }
     public void SetPlayer(GameObject _player1, GameObject _player2)
     {   //create player
-        player1GO = _player1;
-        player2GO = _player2;
+        player1GO = Instantiate(_player1, StartRandomPosition(), Quaternion.identity);
+        player2GO = Instantiate(_player2, StartRandomPosition(), Quaternion.identity);
         //getscripts
         player1 = player1GO.GetComponent<Player>();
         player2 = player2GO.GetComponent<Player>();
         //add tag
         player1GO.tag = player1s;
         player2GO.tag = player2s;
-        //get start position
-        player1GO.transform.position = StartRandomPosition(player2GO);
-        player2GO.transform.position = StartRandomPosition(player1GO);
 
+        player1.StartSetup();
+        player2.StartSetup();
+    }
+    public void SetPlayerName(string _player1, string _player2)
+    {
+        if (_player1 == "")
+            _player1 = player1s;
+        namePlayer1.text = _player1;
+
+        if (_player2 == "")
+            _player2 = player2s;
+        namePlayer2.text = _player2;
     }
     public bool ActivePlayer1() { return player1.enabled; }
     public Player GetActivePlayer()
@@ -134,7 +149,15 @@ public class GameMenager : MonoBehaviour
         else return null;
     }
     //Private
-    void Start() { myCamera = GetComponent<CameraFollow>(); }
+    void Start()
+    {
+        shop = FindObjectOfType<Shop>();
+        canvasShop = shop.GetComponent<Canvas>();
+        canvasShop.enabled = false;
+        myCamera = GetComponent<CameraFollow>();
+        control.enabled = false;
+        turnCanvas.enabled = false;
+    }
     void SetupPlayer1()
     {
         player1.SetForceBar();
@@ -158,6 +181,8 @@ public class GameMenager : MonoBehaviour
 
         DontDestroyOnLoad(this.gameObject);
     }
+    void SetTurnText() { turnText.text = cTurn.ToString() + "/" + maxTurn.ToString(); }
+    void SetScoreText() { scoreText.text = score[0].ToString() + ":" + score[1].ToString(); }
     IEnumerator NextTurn()
     {
         Debug.Log("Start New turn");
@@ -187,16 +212,35 @@ public class GameMenager : MonoBehaviour
 
         WeaponsChange weaponsChange = FindObjectOfType<WeaponsChange>();
         weaponsChange.wasShootInThisTurn = false;
-    } 
-    Vector3 StartRandomPosition(GameObject enemy)
+    }
+    IEnumerator FirstTurn()
     {
-        Vector3 startPos;
-        Vector3 enemyPos = enemy.transform.position;
-        startPos = new Vector3(Random.Range(-70f, 70f), 25f, 0f);
-        if ((startPos.x - enemyPos.x) >= 10f)
-            return startPos;
-        else
-            StartRandomPosition(enemy);
-        return new Vector3(0f, 25f, 0f);
+        turnCanvas.enabled = true;
+        yield return new WaitForSecondsRealtime(5f);
+        turnCanvas.enabled = false;
+        control.enabled = true;
+        myCamera = GetComponent<CameraFollow>();
+        if (player1GO == null || player2GO == null)
+        {
+            player1GO = GameObject.FindGameObjectWithTag(player1s);
+            player2GO = GameObject.FindGameObjectWithTag(player2s);
+            player1 = player1GO.GetComponent<Player>();
+            player2 = player2GO.GetComponent<Player>();
+        }
+
+        player1.enabled = true;
+        player2.enabled = false;
+        SetTurnText();
+        SetScoreText();
+        myCamera.SetTargetToCamera(player1GO.transform);
+    }
+    Vector3 StartRandomPosition()
+    {
+        Vector3 startPos=new Vector3(Random.Range(-70f,70f), 20f, 0f);
+        if(player1GO!=null && Vector3.Distance(player1GO.transform.position, startPos)<=10f)
+        {
+            StartRandomPosition();
+        }
+        return startPos;
     }
 }

@@ -1,11 +1,13 @@
-﻿using UnityEngine;
+﻿using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody2D))]
 [RequireComponent(typeof(Collider2D))]
 public class Player : MonoBehaviour, IDamageable<float>
 {
     //Move
-    [SerializeField] GameObject body;
+    [SerializeField] GameObject body = null;
     //TODO add audio move
     Rigidbody2D rb = null;
     float mSpeed = 4000f;
@@ -49,6 +51,9 @@ public class Player : MonoBehaviour, IDamageable<float>
             fuel = 0;
             Debug.Log("Empty"); //TODO text on screen
         }
+
+        if (gameObject.transform.rotation.z > 30f) gameObject.transform.rotation =new  Quaternion(0f, gameObject.transform.rotation.y, 30f, 1f);
+        if (gameObject.transform.rotation.z < -30f) gameObject.transform.rotation =new  Quaternion(0f, gameObject.transform.rotation.y, -30f, 1f);
     }
     public void MathCannonAngle(float dMoveCannon)
     {
@@ -97,10 +102,11 @@ public class Player : MonoBehaviour, IDamageable<float>
     //TypeOfWeapon
     void SingleShot()
     {
-        if (weapons.singleShoot)
+        if (weapons.type == Weapons.Type.Single)
         {   //create bullet and focus camera on then
             GameObject bullet = weapons.tiles;
             GameObject tile = Instantiate(bullet, tShoot.position, Quaternion.identity);
+            SetWeaponsSystemToBullet(bullet.GetComponent<Bullet>());
             myCamera.SetTargetToCamera(tile.transform);
             //add force to bullet
             Vector2 dir = DirToBullet();
@@ -110,7 +116,7 @@ public class Player : MonoBehaviour, IDamageable<float>
     }
     void TripleShot()
     {
-        if (weapons.triShot)
+        if (weapons.type == Weapons.Type.Tri)
         {
             GameObject bullet = weapons.tiles;
             GameObject[] tile = new GameObject[3];
@@ -128,7 +134,8 @@ public class Player : MonoBehaviour, IDamageable<float>
             }
         }
     }
-    
+    void RepairKit() { cHealth += weapons.damage; if (cHealth > maxHealth) cHealth = maxHealth; }
+    void SetWeaponsSystemToBullet(Bullet bullet) { bullet.SetWeapons(weapons); }
     //UI Setup
     public void SetFuelBar()
     {
@@ -172,13 +179,13 @@ public class Player : MonoBehaviour, IDamageable<float>
         }
     }
 
-    void StartSetup()
+    public void StartSetup()
     {
         rb = GetComponent<Rigidbody2D>();
         gameMenager = FindObjectOfType<GameMenager>();
         myCamera = FindObjectOfType<CameraFollow>();
         weaponsChange = FindObjectOfType<WeaponsChange>();
-        gameMenager.FirstTurn();
+        gameMenager.StartFirstTurn();
         SetForceBar();
         SetFuelBar();
         SetAngleText();
@@ -187,14 +194,12 @@ public class Player : MonoBehaviour, IDamageable<float>
         cHealth = maxHealth;
         fuel = 100f;
     }
-    void Start() { StartSetup(); }
     void UpdateSetup()
     {
         CharacterMove(0);
         CharacterMoveCannon();
     }
     void FixedUpdate() { UpdateSetup(); }
-
     void CharacterFlip(float dMove)
     {
         if (dMove > 0 && !facingRight)
@@ -221,7 +226,7 @@ public class Player : MonoBehaviour, IDamageable<float>
         float coin = Random.Range(3f, 6f);
         gameMenager.SetCoin(gameObject.tag, (int)(coin * multiple));//TODO change coin system
     }
-    void Dead() { gameMenager.Kill(); }
+    void Dead() { gameMenager.Kill(gameObject.tag); }
     Vector2 DirToBullet()
     {
         float bSpeed = weapons.speed * force;

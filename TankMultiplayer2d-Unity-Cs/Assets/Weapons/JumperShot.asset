@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6f1c4d97d9ed86345b246f04d922934b, type: 3}
+  m_Name: JumperShot
+  m_EditorClassIdentifier: 
+  wName: Jumper Shot
+  description: Bounce bounce baybe!
+  damage: 15
+  speed: 20
+  tiles: {fileID: 2316948238032716972, guid: 9902a1cff3a049a4ca7ef9510cf718f8, type: 3}
+  effect: {fileID: 1743705007521168038, guid: d141cac6be3f64542825a7717c182520, type: 3}
+  type: 5
+  timer: 5
+  price: 250
+  img: {fileID: 21300000, guid: 8d220c8d331dca8499a5816f4f2dc5e7, type: 3}

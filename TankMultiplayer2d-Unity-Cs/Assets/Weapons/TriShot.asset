@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6f1c4d97d9ed86345b246f04d922934b, type: 3}
+  m_Name: TriShot
+  m_EditorClassIdentifier: 
+  wName: Tri Shoot
+  description: Nothing more, only 3 single shot
+  damage: 5
+  speed: 20
+  tiles: {fileID: 6725460714831489907, guid: f1c8ab848733e304b903e358532f752f, type: 3}
+  effect: {fileID: 8791573830889426202, guid: b85941285aa4f984998e068c76ef5676, type: 3}
+  type: 2
+  timer: 0
+  price: 150
+  img: {fileID: 21300000, guid: fe9f212edb05fb142bd57a591cff0f58, type: 3}

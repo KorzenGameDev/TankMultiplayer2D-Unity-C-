@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6f1c4d97d9ed86345b246f04d922934b, type: 3}
+  m_Name: SingleShot
+  m_EditorClassIdentifier: 
+  wName: Single
+  description: This is only single shot
+  damage: 0
+  speed: 20
+  tiles: {fileID: 2316948238032716972, guid: 9902a1cff3a049a4ca7ef9510cf718f8, type: 3}
+  effect: {fileID: 8791573830889426202, guid: b85941285aa4f984998e068c76ef5676, type: 3}
+  type: 0
+  timer: 0
+  price: 10
+  img: {fileID: 21300000, guid: 1ae07621ebaecb948b21069cd7c8ef06, type: 3}

@@ -48,9 +48,9 @@ TagManager:
   - name: Player
     uniqueID: 780631861
     locked: 0
-  - name: Effects
-    uniqueID: 724881651
-    locked: 0
   - name: Backgound
     uniqueID: 4133695215
+    locked: 0
+  - name: Effects
+    uniqueID: 724881651
     locked: 0
